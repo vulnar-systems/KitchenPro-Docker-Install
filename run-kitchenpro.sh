@@ -50,10 +50,10 @@ chmod +x import-backup.sh
 
 echo "→ Creating .env file…"
 cat > .env <<EOF
-MYSQL_ROOT_PASSWORD=ChangeMeRoot123!
-MYSQL_DATABASE=kpro
-MYSQL_USER=appuser
-MYSQL_PASSWORD=AppPass123!
+MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+MYSQL_DATABASE=${MYSQL_DATABASE}
+MYSQL_USER=${MYSQL_USER}
+MYSQL_PASSWORD=${MYSQL_PASSWORD}
 EOF
 
 echo "→ Creating docker-compose.yml…"
