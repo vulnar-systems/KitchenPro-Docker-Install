@@ -17,6 +17,26 @@ newgrp docker <<EOF
 echo "✓ Docker group activated"
 EOF
 
+
+echo
+echo "#########################################"
+echo "  KitchenPro Environment Setup Prompts"
+echo "#########################################"
+echo
+
+# Prompt for variables to inject into the .env file
+read -rp "Enter MySQL root password: " MYSQL_ROOT_PASSWORD
+read -rp "Enter KitchenPro database name (default: kpro): " MYSQL_DATABASE
+MYSQL_DATABASE=${MYSQL_DATABASE:-kpro}
+
+read -rp "Enter KitchenPro DB username (default: appuser): " MYSQL_USER
+MYSQL_USER=${MYSQL_USER:-appuser}
+
+read -rp "Enter KitchenPro DB user password: " MYSQL_PASSWORD
+
+echo
+echo "✓ Values captured. Writing .env…"
+
 echo "→ Creating KitchenPro stack directory…"
 mkdir -p ~/kitchenpro-stack
 cd ~/kitchenpro-stack
