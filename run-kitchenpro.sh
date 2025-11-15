@@ -21,6 +21,9 @@ echo "→ Creating KitchenPro stack directory…"
 mkdir -p ~/kitchenpro-stack
 cd ~/kitchenpro-stack
 
+echo "Copy backup from deploy to stack"
+mv ~/kichenpro-deploy/backup.sql ~/kitchenpro-stack/backup.sql
+
 echo "→ Creating .env file…"
 cat > .env <<EOF
 MYSQL_ROOT_PASSWORD=ChangeMeRoot123!
