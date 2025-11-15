@@ -23,7 +23,10 @@ cd ~/kitchenpro-stack
 
 echo "Copy backup from deploy to stack"
 mv ~/kitchenpro-deploy/backup.sql ~/kitchenpro-stack
+echo "moved back.sql to stack"
 mv ~/kitchenpro-deploy/import-backup.sh ~/kitchenpro-stack
+chmod +x import-backup.sh
+
 
 echo "→ Creating .env file…"
 cat > .env <<EOF
