@@ -22,7 +22,7 @@ mkdir -p ~/kitchenpro-stack
 cd ~/kitchenpro-stack
 
 echo "Copy backup from deploy to stack"
-mv ~/kichenpro-deploy/backup.sql ~/kitchenpro-stack/backup.sql
+mv ~/kichenpro-deploy/backup.sql ~/kitchenpro-stack
 
 echo "→ Creating .env file…"
 cat > .env <<EOF
