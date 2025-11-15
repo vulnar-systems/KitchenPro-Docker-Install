@@ -98,7 +98,7 @@ echo "→ Bringing stack up fresh (remove old volumes)…"
 docker compose down -v || true
 docker compose up -d
 
-echo "→ Importing backup.sql into ${MYSQL_DATABASE}..."
+echo "→ Importing backup.sql into kpro"
 ./import-backup.sh
 
 
