@@ -1,59 +1,100 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-STACK_DIR="$HOME/kitchenpro-stack"
+echo "→ Updating Fedora and installing Docker Engine…"
+sudo dnf -y install dnf-plugins-core
+sudo dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+sudo dnf -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
 
-echo "→ Using stack directory: $STACK_DIR"
+echo "→ Enabling and starting Docker service…"
+sudo systemctl enable --now docker
 
-if [ ! -d "$STACK_DIR" ]; then
-  echo "✖ Directory $STACK_DIR does not exist. Create it and put docker-compose.yml, .env, and backup.sql inside."
+echo "→ Adding your user to the docker group…"
+sudo usermod -aG docker "$USER"
+
+echo "→ Reloading group permissions…"
+newgrp docker <<EOF
+echo "✓ Docker group activated"
+EOF
+
+echo "→ Creating KitchenPro stack directory…"
+mkdir -p ~/kitchenpro-stack
+cd ~/kitchenpro-stack
+
+echo "→ Creating .env file…"
+cat > .env <<EOF
+MYSQL_ROOT_PASSWORD=ChangeMeRoot123!
+MYSQL_DATABASE=kpro
+MYSQL_USER=appuser
+MYSQL_PASSWORD=AppPass123!
+EOF
+
+echo "→ Creating docker-compose.yml…"
+cat > docker-compose.yml <<'EOF'
+services:
+  app:
+    image: docker.io/otshabeng/kitchenpro-app:latest
+    container_name: kitchenpro-app
+    environment:
+      MYSQL_HOST: db
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+
+  db:
+    image: docker.io/otshabeng/kitchenpro-db:latest
+    container_name: kitchenpro-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./backup.sql:/docker-entrypoint-initdb.d/backup.sql:Z
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: docker.io/phpmyadmin:5
+    container_name: kitchenpro-pma
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      UPLOAD_LIMIT: 64M
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    restart: unless-stopped
+EOF
+
+echo "→ Checking for backup.sql..."
+if [ ! -f ./backup.sql ]; then
+  echo "✖ ERROR: backup.sql is missing in ~/kitchenpro-stack"
+  echo "Place backup.sql in ~/kitchenpro-stack and run:"
+  echo "    docker compose up -d"
   exit 1
 fi
 
-cd "$STACK_DIR"
+echo "→ Opening firewall ports (8080, 8081, 3307)…"
+sudo firewall-cmd --permanent --add-port=8080/tcp --add-port=8081/tcp --add-port=3307/tcp || true
+sudo firewall-cmd --reload || true
 
-# sanity checks
-if [ ! -f docker-compose.yml ]; then
-  echo "✖ docker-compose.yml not found in $STACK_DIR"
-  exit 1
-fi
-
-if [ ! -f .env ]; then
-  echo "✖ .env file not found in $STACK_DIR"
-  exit 1
-fi
-
-if [ ! -f backup.sql ]; then
-  echo "✖ backup.sql not found in $STACK_DIR (required for DB seeding)"
-  exit 1
-fi
-
-echo "✓ Found docker-compose.yml, .env, and backup.sql"
-
-# ensure docker is running
-if ! systemctl is-active --quiet docker; then
-  echo "→ Starting Docker service..."
-  sudo systemctl enable --now docker
-fi
-
-echo "→ Stopping existing stack and removing volumes (fresh DB seed)..."
+echo "→ Bringing stack up fresh (remove old volumes)…"
 docker compose down -v || true
-
-echo "→ Pulling latest images..."
-docker compose pull
-
-echo "→ Bringing stack up in the background..."
 docker compose up -d
 
-# Open firewall ports if firewalld exists
-if command -v firewall-cmd >/dev/null 2>&1; then
-  echo "→ Configuring firewall (8080, 8081, 3307)..."
-  sudo firewall-cmd --permanent --add-port=8080/tcp --add-port=8081/tcp --add-port=3307/tcp || true
-  sudo firewall-cmd --reload || true
-fi
-
 echo
-echo "✓ KitchenPro stack is up."
+echo "✓ KitchenPro is now running."
 echo "  App:        http://localhost:8080"
 echo "  phpMyAdmin: http://localhost:8081"
 echo "  MySQL:      localhost:3307"
+echo
+echo "If Docker complains about permissions, reboot or log out and in."
