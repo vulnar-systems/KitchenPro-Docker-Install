@@ -23,6 +23,7 @@ cd ~/kitchenpro-stack
 
 echo "Copy backup from deploy to stack"
 mv ~/kitchenpro-deploy/backup.sql ~/kitchenpro-stack
+mv ~/kitchenpro-deploy/import-backup.sh ~/kitchenpro-stack
 
 echo "→ Creating .env file…"
 cat > .env <<EOF
@@ -93,6 +94,10 @@ sudo firewall-cmd --reload || true
 echo "→ Bringing stack up fresh (remove old volumes)…"
 docker compose down -v || true
 docker compose up -d
+
+echo "→ Importing backup.sql into ${MYSQL_DATABASE}..."
+./import-backup.sh
+
 
 echo
 echo "✓ KitchenPro is now running."
