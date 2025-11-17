@@ -60,18 +60,21 @@ echo "→ Creating docker-compose.yml…"
 cat > docker-compose.yml <<'EOF'
 services:
   app:
-    image: docker.io/otshabeng/kitchenpro-app:latest
-    container_name: kitchenpro-app
-    environment:
-      MYSQL_HOST: db
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-    restart: unless-stopped
+  image: docker.io/otshabeng/kitchenpro-app:latest
+  container_name: kitchenpro-app
+  environment:
+    MYSQL_HOST: db
+    MYSQL_DATABASE: ${MYSQL_DATABASE}
+    MYSQL_USER: ${MYSQL_USER}
+    MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+  ports:
+    - "8080:80"
+  devices:
+    - "/dev/lp0:/dev/lp0"
+  depends_on:
+    - db
+  restart: unless-stopped
+
 
   db:
     image: docker.io/otshabeng/kitchenpro-db:latest
