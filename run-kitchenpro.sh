@@ -47,6 +47,11 @@ echo "moved back.sql to stack"
 mv ~/kitchenpro-deploy/import-backup.sh ~/kitchenpro-stack
 chmod +x import-backup.sh
 
+echo "moved install-cron-tab to stack"
+mv ~/kitchenpro-deploy/install-kitchenpro-cron.sh ~/kitchenpro-stack
+chmod +x install-kitchenpro-cron.sh
+
+
 
 echo "→ Creating .env file…"
 cat > .env <<EOF
@@ -126,6 +131,9 @@ docker compose up -d
 
 echo "→ Importing backup.sql into kpro"
 ./import-backup.sh
+
+echo " Creating system cron jobs"
+./install-kitchenpro-cron.sh
 
 
 echo
