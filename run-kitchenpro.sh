@@ -59,7 +59,6 @@ EOF
 echo "→ Creating docker-compose.yml…"
 cat > docker-compose.yml <<'EOF'
 services:
-services:
   app:
     image: docker.io/otshabeng/kitchenpro-app:latest
     container_name: kitchenpro-app
