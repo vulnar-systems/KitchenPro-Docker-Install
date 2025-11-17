@@ -1,15 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-echo "→ Installing cron service (cronie)…"
-sudo dnf -y install cronie
+echo "→ Updating package lists…"
+apt-get update -y
 
-echo "→ Enabling and starting crond…"
-sudo systemctl enable --now crond
+echo "→ Installing cron service…"
+DEBIAN_FRONTEND=noninteractive apt-get install -y cron
+
+echo "→ Ensuring /usr/bin/php exists…"
+if [ ! -x /usr/bin/php ]; then
+  echo "✖ /usr/bin/php not found. Installing CLI PHP…"
+  DEBIAN_FRONTEND=noninteractive apt-get install -y php-cli
+fi
 
 echo "→ Creating KitchenPro cron job file…"
 
-sudo tee /etc/cron.d/kitchenpro > /dev/null << 'EOF'
+cat > /etc/cron.d/kitchenpro << 'EOF'
 # KitchenPro Cron Jobs
 
 # Run every minute: post stock moves
@@ -20,10 +26,10 @@ sudo tee /etc/cron.d/kitchenpro > /dev/null << 'EOF'
 EOF
 
 echo "→ Applying correct permissions…"
-sudo chmod 644 /etc/cron.d/kitchenpro
+chmod 644 /etc/cron.d/kitchenpro
 
-echo "→ Restarting crond..."
-sudo systemctl restart crond
+echo "→ Starting cron service in the background…"
+service cron restart || service cron start
 
 echo "✓ Cron jobs installed:"
 echo "  - Every minute: cron_post_stock_moves.php"
