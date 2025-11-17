@@ -133,7 +133,18 @@ echo "→ Importing backup.sql into kpro"
 ./import-backup.sh
 
 echo " Creating system cron jobs"
-./install-kitchenpro-cron.sh
+#./install-kitchenpro-cron.sh
+
+docker exec -it kitchenpro-app
+echo "logged into app"
+
+echo "installing nano"
+apt-get update
+apt-get install nano -y
+
+echo "nano installed"
+
+exit
 
 
 echo
