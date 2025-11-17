@@ -135,7 +135,7 @@ echo "→ Importing backup.sql into kpro"
 echo " Creating system cron jobs"
 #./install-kitchenpro-cron.sh
 
-docker exec -it kitchenpro-app
+docker exec -it kitchenpro-app bash
 echo "logged into app"
 
 echo "installing nano"
