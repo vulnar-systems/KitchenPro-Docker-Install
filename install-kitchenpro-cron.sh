@@ -5,12 +5,12 @@ echo "→ Updating package lists…"
 apt-get update -y
 
 echo "→ Installing cron service…"
-DEBIAN_FRONTEND=noninteractive apt-get install -y cron
+apt-get install -y cron
 
 echo "→ Ensuring /usr/bin/php exists…"
 if [ ! -x /usr/bin/php ]; then
   echo "✖ /usr/bin/php not found. Installing CLI PHP…"
-  DEBIAN_FRONTEND=noninteractive apt-get install -y php-cli
+  apt-get install -y php-cli
 fi
 
 echo "→ Creating KitchenPro cron job file…"
