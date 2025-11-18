@@ -132,14 +132,14 @@ docker compose up -d
 echo "→ Importing backup.sql into kpro"
 ./import-backup.sh
 
-echo " Creating system cron jobs"
+#echo " Creating system cron jobs"
 #./install-kitchenpro-cron.sh
 
-docker cp install-kitchenpro-cron.sh kitchenpro-app:/root/install-kitchenpro-cron.sh
-docker exec -it kitchenpro-app bash /root/install-kitchenpro-cron.sh
+#docker cp install-kitchenpro-cron.sh kitchenpro-app:/root/install-kitchenpro-cron.sh
+#docker exec -it kitchenpro-app bash /root/install-kitchenpro-cron.sh
 
-echo "Created cron jobs success"
-exit
+#echo "Created cron jobs success"
+#exit
 
 
 echo
