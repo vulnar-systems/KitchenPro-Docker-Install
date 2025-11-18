@@ -135,9 +135,10 @@ echo "→ Importing backup.sql into kpro"
 echo " Creating system cron jobs"
 #./install-kitchenpro-cron.sh
 
-docker exec -it kitchenpro-app bash | apt-get update | apt-get install nano -y
+docker cp install-kitchenpro-cron.sh kitchenpro-app:/root/install-kitchenpro-cron.sh
+docker exec -it kitchenpro-app bash /root/install-kitchenpro-cron.sh
 
-
+echo "Created cron jobs success"
 exit
 
 
